@@ -4,6 +4,7 @@ import unittest
 import tempfile
 
 from internal.pkg.grouper.grouper import Grouper
+from configs.config_grouper import CommandArgs
 
 
 class TestGrouper(unittest.TestCase):
@@ -26,8 +27,9 @@ class TestGrouper(unittest.TestCase):
         """
         extensions = set(['xls', 'docx', 'pdf'])
         path = self.generate_files(extensions)
+        command_args = CommandArgs(path, set())
 
-        grouper = Grouper(path)
+        grouper = Grouper(command_args)
         _, found_ext = grouper.get_extensions()
         shutil.rmtree(path)
 
@@ -36,12 +38,51 @@ class TestGrouper(unittest.TestCase):
     def test_move_files(self):
         extensions = set(['xls', 'docx', 'pdf'])
         path = self.generate_files(extensions)
+        command_args = CommandArgs(path, set())
 
-        grouper = Grouper(path)
+        grouper = Grouper(command_args)
         grouper.move_files()
         list_dir = os.listdir(path)
         shutil.rmtree(path)
         self.assertEqual(extensions, set(list_dir))
+
+    def test_files_with_equal_names(self):
+        temp_path_dir = tempfile.mkdtemp()
+        os.mkdir(temp_path_dir + '/' + 'csv')
+        file1 = open(temp_path_dir + '/' + 'csv' + '/' + 'file.csv', 'w')
+        file1.close()
+
+        file2 = open(temp_path_dir + '/' + 'file.csv', 'w')
+        file2.close()
+
+        command_args = CommandArgs(temp_path_dir, set())
+        grouper = Grouper(command_args)
+        grouper.move_files()
+        len_files = len(os.listdir(temp_path_dir + '/' + 'csv'))
+        shutil.rmtree(temp_path_dir)
+        self.assertEqual(len_files, 2)
+
+    def test_move_csv_files(self):
+        temp_path_dir = tempfile.mkdtemp()
+        file1 = open(temp_path_dir + '/' + 'file1.csv', 'w')
+        file1.close()
+
+        file2 = open(temp_path_dir + '/' + 'file2.txt', 'w')
+        file2.close()
+
+        command_args = CommandArgs(temp_path_dir, set(['csv']))
+        grouper = Grouper(command_args)
+        grouper.move_files()
+
+        len_csv_files = len(os.listdir(temp_path_dir + '/csv'))
+        len_files = len(os.listdir(temp_path_dir))
+
+        txt_dir = os.path.exists(temp_path_dir + '/txt')
+
+        shutil.rmtree(temp_path_dir)
+        self.assertEqual(len_files, 2)
+        self.assertEqual(txt_dir, False)
+        self.assertEqual(len_csv_files, 1)
 
 
 if __name__ == '__main__':
