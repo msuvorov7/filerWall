@@ -8,6 +8,9 @@ sys.path.insert(0, os.path.dirname(
 
 from configs.config_grouper import CommandArgs, parse_args, config_name
 from internal.pkg.base.base import Base
+from logger.logger import setup_logger
+
+logger = setup_logger('grouper')
 
 
 class Grouper(Base):
@@ -49,6 +52,7 @@ class Grouper(Base):
         for end in self.extensions:
             if not os.path.isdir(self.path + '/' + end):
                 os.mkdir(self.path + '/' + end)
+        logger.info(f'CREATED %d DIRECTORIES', len(self.extensions))
 
     def move_files(self):
         for filename in self.files:
@@ -62,7 +66,7 @@ class Grouper(Base):
             else:
                 end_path = self.path + '/' + end + '/' + filename
             os.replace(start_path, end_path)
-            print(end_path)
+        logger.info(f'%d FILES WITH EXTs MOVED', len(self.files))
 
     def check_without_ext(self):
         if not self.without_ext:
@@ -80,18 +84,21 @@ class Grouper(Base):
                 else:
                     end_path = self.path + '/' + end + '/' + filename
                 os.replace(start_path, end_path)
+        logger.info(f'%d FILES WITHOUT EXTs MOVED', len(files))
 
     def run(self):
+        logger.info('START')
         self.create_dirs_from_ext()
         self.move_files()
         self.check_without_ext()
+        logger.info('END')
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    command_args = CommandArgs(args.p, args.e, args.a)
-    print(args.a)
-    grouper = Grouper(command_args)
-    print(grouper.new_name)
-    print(grouper.name)
-    grouper.run()
+    try:
+        args = parse_args()
+        command_args = CommandArgs(args.p, args.e, args.a)
+        grouper = Grouper(command_args)
+        grouper.run()
+    except Exception as e:
+        logger.exception('\nException: {e}\n'.format(e=e))
