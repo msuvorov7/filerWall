@@ -27,10 +27,10 @@ class TestGrouper(unittest.TestCase):
         """
         extensions = set(['xls', 'docx', 'pdf'])
         path = self.generate_files(extensions)
-        command_args = CommandArgs(path, set())
+        command_args = CommandArgs(path, [])
 
         grouper = Grouper(command_args)
-        _, found_ext = grouper.get_extensions()
+        found_ext = grouper.get_extensions()
         shutil.rmtree(path)
 
         self.assertEqual(found_ext, extensions)
@@ -38,10 +38,10 @@ class TestGrouper(unittest.TestCase):
     def test_move_files(self):
         extensions = set(['xls', 'docx', 'pdf'])
         path = self.generate_files(extensions)
-        command_args = CommandArgs(path, set())
+        command_args = CommandArgs(path, [])
 
         grouper = Grouper(command_args)
-        grouper.move_files()
+        grouper.run()
         list_dir = os.listdir(path)
         shutil.rmtree(path)
         self.assertEqual(extensions, set(list_dir))
@@ -55,9 +55,9 @@ class TestGrouper(unittest.TestCase):
         file2 = open(temp_path_dir + '/' + 'file.csv', 'w')
         file2.close()
 
-        command_args = CommandArgs(temp_path_dir, set())
+        command_args = CommandArgs(temp_path_dir, [])
         grouper = Grouper(command_args)
-        grouper.move_files()
+        grouper.run()
         len_files = len(os.listdir(temp_path_dir + '/' + 'csv'))
         shutil.rmtree(temp_path_dir)
         self.assertEqual(len_files, 2)
@@ -70,9 +70,9 @@ class TestGrouper(unittest.TestCase):
         file2 = open(temp_path_dir + '/' + 'file2.txt', 'w')
         file2.close()
 
-        command_args = CommandArgs(temp_path_dir, set(['csv']))
+        command_args = CommandArgs(temp_path_dir, ['csv'])
         grouper = Grouper(command_args)
-        grouper.move_files()
+        grouper.run()
 
         len_csv_files = len(os.listdir(temp_path_dir + '/csv'))
         len_files = len(os.listdir(temp_path_dir))

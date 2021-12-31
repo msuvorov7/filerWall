@@ -15,7 +15,19 @@ class Grouper(Base):
         super().__init__()
         self.new_name = config_name
         self.path = self._prepare_path(command_ags.path)
-        self.extensions = command_ags.extensions
+        self.extensions = self._prepare_ext(command_ags.extensions)
+        self.files = self._prepare_files()
+
+    def _prepare_ext(self, ext: list) -> set:
+        if len(ext) == 0:
+            return self.get_extensions()
+        else:
+            return set(ext)
+
+    def _prepare_files(self) -> list:
+        files = self.get_visible_files()
+        files = list(filter(lambda x: x.split('.')[-1] in self.extensions, files))
+        return files
 
     def get_visible_files(self) -> list:
         all_files = os.listdir(self.path)
@@ -23,48 +35,43 @@ class Grouper(Base):
         hidden_files = list(filter(lambda x: x.startswith('.'), files))
         return list(set(files) - set(hidden_files))
 
-    def get_extensions(self) -> (list, set):
+    def get_extensions(self) -> set:
         files = self.get_visible_files()
         endings = set()
         for x in files:
             name_splinted = x.split('.')
             if len(name_splinted) > 1:
                 endings.add(name_splinted[-1])
-        return files, endings
+        return endings
 
-    def move_files(self):
-        if len(self.extensions) == 0:
-            files, endings = self.get_extensions()
-        else:
-            files, endings = self.get_visible_files(), self.extensions
-
-        for end in endings:
+    def create_dirs_from_ext(self):
+        for end in self.extensions:
             if not os.path.isdir(self.path + '/' + end):
                 os.mkdir(self.path + '/' + end)
 
-        for filename in files:
+    def move_files(self):
+        for filename in self.files:
             name_splinted = filename.split('.')
-            if len(name_splinted) > 1:
-                end = name_splinted[-1]
-                if end not in endings:
-                    continue
-                start_path = self.path + '/' + filename
-                if os.path.exists(self.path + '/' + end + '/' + filename):
-                    ext = filename.split('.')[-1]
-                    name = filename[:-len(ext) - 1]
-                    end_path = self.path + '/' + end + '/' + name + '_' + str(int(random.random() * 10000)) + '.' + ext
-                else:
-                    end_path = self.path + '/' + end + '/' + filename
-                os.replace(start_path, end_path)
-                print(end_path)
+            end = name_splinted[-1]
+            start_path = self.path + '/' + filename
+            if os.path.exists(self.path + '/' + end + '/' + filename):
+                ext = filename.split('.')[-1]
+                name = filename[:-len(ext) - 1]
+                end_path = self.path + '/' + end + '/' + name + '_' + str(int(random.random() * 10000)) + '.' + ext
+            else:
+                end_path = self.path + '/' + end + '/' + filename
+            os.replace(start_path, end_path)
+            print(end_path)
+
+    def run(self):
+        self.create_dirs_from_ext()
+        self.move_files()
 
 
 if __name__ == "__main__":
     args = parse_args()
-    print(args.p)
-    print(set(args.e))
-    command_args = CommandArgs(args.p, set(args.e))
+    command_args = CommandArgs(args.p, args.e)
     grouper = Grouper(command_args)
     print(grouper.new_name)
     print(grouper.name)
-    grouper.move_files()
+    grouper.run()

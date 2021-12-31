@@ -7,7 +7,7 @@ config_name = 'grouper'
 @dataclass
 class CommandArgs:
     path: str
-    extensions: set
+    extensions: list
 
 
 def parse_args() -> argparse.Namespace:
