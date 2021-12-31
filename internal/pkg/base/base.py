@@ -2,6 +2,9 @@ from configs.config_base import config_name
 
 
 class Base:
+    """
+    Базовый класс для пакетов. Здесь будут общие функции
+    """
     def __init__(self):
         self.name = config_name
 
