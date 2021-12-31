@@ -17,6 +17,7 @@ class Grouper(Base):
         self.path = self._prepare_path(command_ags.path)
         self.extensions = self._prepare_ext(command_ags.extensions)
         self.files = self._prepare_files()
+        self.without_ext = command_ags.without_ext
 
     def _prepare_ext(self, ext: list) -> set:
         if len(ext) == 0:
@@ -63,14 +64,33 @@ class Grouper(Base):
             os.replace(start_path, end_path)
             print(end_path)
 
+    def check_without_ext(self):
+        if not self.without_ext:
+            return
+        else:
+            end = 'UNK_EXT'
+            if not os.path.isdir(self.path + '/' + end):
+                os.mkdir(self.path + '/' + end)
+            files = self.get_visible_files()
+            files = list(filter(lambda x: len(x.split('.')) == 1, files))
+            for filename in files:
+                start_path = self.path + '/' + filename
+                if os.path.exists(self.path + '/' + end + '/' + filename):
+                    end_path = self.path + '/' + end + '/' + filename + '_' + str(int(random.random() * 10000))
+                else:
+                    end_path = self.path + '/' + end + '/' + filename
+                os.replace(start_path, end_path)
+
     def run(self):
         self.create_dirs_from_ext()
         self.move_files()
+        self.check_without_ext()
 
 
 if __name__ == "__main__":
     args = parse_args()
-    command_args = CommandArgs(args.p, args.e)
+    command_args = CommandArgs(args.p, args.e, args.a)
+    print(args.a)
     grouper = Grouper(command_args)
     print(grouper.new_name)
     print(grouper.name)

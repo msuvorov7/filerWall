@@ -27,7 +27,7 @@ class TestGrouper(unittest.TestCase):
         """
         extensions = set(['xls', 'docx', 'pdf'])
         path = self.generate_files(extensions)
-        command_args = CommandArgs(path, [])
+        command_args = CommandArgs(path, [], False)
 
         grouper = Grouper(command_args)
         found_ext = grouper.get_extensions()
@@ -38,7 +38,7 @@ class TestGrouper(unittest.TestCase):
     def test_move_files(self):
         extensions = set(['xls', 'docx', 'pdf'])
         path = self.generate_files(extensions)
-        command_args = CommandArgs(path, [])
+        command_args = CommandArgs(path, [], False)
 
         grouper = Grouper(command_args)
         grouper.run()
@@ -55,7 +55,7 @@ class TestGrouper(unittest.TestCase):
         file2 = open(temp_path_dir + '/' + 'file.csv', 'w')
         file2.close()
 
-        command_args = CommandArgs(temp_path_dir, [])
+        command_args = CommandArgs(temp_path_dir, [], False)
         grouper = Grouper(command_args)
         grouper.run()
         len_files = len(os.listdir(temp_path_dir + '/' + 'csv'))
@@ -70,7 +70,7 @@ class TestGrouper(unittest.TestCase):
         file2 = open(temp_path_dir + '/' + 'file2.txt', 'w')
         file2.close()
 
-        command_args = CommandArgs(temp_path_dir, ['csv'])
+        command_args = CommandArgs(temp_path_dir, ['csv'], False)
         grouper = Grouper(command_args)
         grouper.run()
 
@@ -84,6 +84,21 @@ class TestGrouper(unittest.TestCase):
         self.assertEqual(txt_dir, False)
         self.assertEqual(len_csv_files, 1)
 
+    def test_files_without_ext(self):
+        temp_path_dir = tempfile.mkdtemp()
+        file1 = open(temp_path_dir + '/' + 'file1', 'w')
+        file1.close()
+
+        file2 = open(temp_path_dir + '/' + 'file2', 'w')
+        file2.close()
+
+        command_args = CommandArgs(temp_path_dir, [], True)
+        grouper = Grouper(command_args)
+        grouper.run()
+
+        len_unk_files = len(os.listdir(temp_path_dir + '/UNK_EXT'))
+        shutil.rmtree(temp_path_dir)
+        self.assertEqual(len_unk_files, 2)
 
 if __name__ == '__main__':
     unittest.main()
