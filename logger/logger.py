@@ -1,5 +1,11 @@
 import logging
 import os
+import sys
+
+sys.path.insert(0, os.path.dirname(
+    os.path.dirname(os.path.realpath(__file__))
+))
+
 
 from configs.config_logger import LOG_DIR_PATH
 

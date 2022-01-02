@@ -62,10 +62,12 @@ class Grouper(Base):
         """
         Создаёт в случае отсутствия директории на основе расщирений
         """
+        cnt = 0
         for end in self.extensions:
             if not os.path.isdir(self.path + '/' + end):
                 os.mkdir(self.path + '/' + end)
-        logger.info(f'CREATED %d DIRECTORIES', len(self.extensions))
+                cnt += 1
+        logger.info(f'CREATED %d DIRECTORIES', cnt)
 
     def move_files(self):
         """
