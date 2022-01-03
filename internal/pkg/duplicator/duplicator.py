@@ -48,6 +48,8 @@ class Duplicator(Base):
         :return:
         """
         for name in os.listdir(path):
+            if name.split('/')[-1][0] == '.':
+                continue
             name = os.path.join(path, name)
             if os.path.isdir(name):
                 if self.recursive:
@@ -55,8 +57,6 @@ class Duplicator(Base):
                 else:
                     continue
             else:
-                if name.split('/')[-1][0] == '.':
-                    continue
                 print(name)
                 hash_sum = md5(name)
                 if hash_sum in self.duplicate_dict:
