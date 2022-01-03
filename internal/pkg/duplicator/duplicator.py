@@ -42,7 +42,8 @@ class Duplicator(Base):
 
     def walk_rec(self, path: str):
         """
-        Рекурсивный поиск в директории. Есть остановка, если не хотим рекурсию
+        Рекурсивный поиск в директории. Есть остановка, если не хотим рекурсию.
+        Не обрабатываем скрытые файлы
         :param path:
         :return:
         """
@@ -54,6 +55,8 @@ class Duplicator(Base):
                 else:
                     continue
             else:
+                if name.split('/')[-1][0] == '.':
+                    continue
                 print(name)
                 hash_sum = md5(name)
                 if hash_sum in self.duplicate_dict:
