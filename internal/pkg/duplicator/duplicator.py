@@ -27,11 +27,15 @@ class Duplicator(Base):
         self.new_name = config_name
         self.duplicate_dict = dict()
         self.path = self._prepare_path(command_ags.path)
-        self.max_size = 1024
         self.recursive = command_ags.is_recursive
+        self.remove = command_ags.is_remove
 
     def find_duplicates(self):
         self.walk_rec(self.path)
+        logger.info(f'FOUND %d DIFFERENT HASHES', len(self.duplicate_dict))
+        for key, value in duplicator.duplicate_dict.items():
+            if len(value) > 1:
+                print(key, value)
 
     def walk_rec(self, path: str):
         for name in os.listdir(path):
@@ -48,19 +52,28 @@ class Duplicator(Base):
                 else:
                     self.duplicate_dict[hash_sum] = [name]
 
+    def remove_duplicates(self):
+        cnt = 0
+        for key, value in self.duplicate_dict.items():
+            if len(value) > 1:
+                for i in range(1, len(value)):
+                    os.remove(value[i])
+                    cnt += 1
+        logger.info(f'REMOVED %d DUPLICATES', cnt)
+
     def run(self):
         logger.info('START')
         self.find_duplicates()
+        if self.remove:
+            self.remove_duplicates()
         logger.info('END')
 
 
 if __name__ == "__main__":
     try:
         args = parse_args()
-        command_args = CommandArgs(args.p, args.r)
+        command_args = CommandArgs(args.p, args.r, args.remove)
         duplicator = Duplicator(command_args)
         duplicator.run()
-        for key, value in duplicator.duplicate_dict.items():
-            print(key, value)
     except Exception as e:
         logger.exception('\nException: {e}\n'.format(e=e))
