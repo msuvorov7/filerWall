@@ -42,11 +42,14 @@ class Duplicator(Base):
 
     def walk_rec(self, path: str):
         """
-        Рекурсивный поиск в директории. Есть остановка, если не хотим рекурсию
+        Рекурсивный поиск в директории. Есть остановка, если не хотим рекурсию.
+        Не обрабатываем скрытые файлы
         :param path:
         :return:
         """
         for name in os.listdir(path):
+            if name.split('/')[-1][0] == '.':
+                continue
             name = os.path.join(path, name)
             if os.path.isdir(name):
                 if self.recursive:
