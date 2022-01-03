@@ -22,6 +22,9 @@ def md5(filename: str) -> str:
 
 
 class Duplicator(Base):
+    """
+    Утилита для поиска одинаковых файлов в каталоге.
+    """
     def __init__(self, command_ags: CommandArgs):
         super().__init__()
         self.new_name = config_name
@@ -33,11 +36,16 @@ class Duplicator(Base):
     def find_duplicates(self):
         self.walk_rec(self.path)
         logger.info(f'FOUND %d DIFFERENT HASHES', len(self.duplicate_dict))
-        for key, value in duplicator.duplicate_dict.items():
+        for key, value in self.duplicate_dict.items():
             if len(value) > 1:
                 print(key, value)
 
     def walk_rec(self, path: str):
+        """
+        Рекурсивный поиск в директории. Есть остановка, если не хотим рекурсию
+        :param path:
+        :return:
+        """
         for name in os.listdir(path):
             name = os.path.join(path, name)
             if os.path.isdir(name):
@@ -46,6 +54,7 @@ class Duplicator(Base):
                 else:
                     continue
             else:
+                print(name)
                 hash_sum = md5(name)
                 if hash_sum in self.duplicate_dict:
                     self.duplicate_dict[hash_sum].append(name)
@@ -53,6 +62,10 @@ class Duplicator(Base):
                     self.duplicate_dict[hash_sum] = [name]
 
     def remove_duplicates(self):
+        """
+        Удаляет все найденные дубликаты, кроме первого. Первый файл берётся случайным образом
+        :return:
+        """
         cnt = 0
         for key, value in self.duplicate_dict.items():
             if len(value) > 1:
