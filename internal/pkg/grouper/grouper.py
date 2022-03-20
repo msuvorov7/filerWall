@@ -25,6 +25,7 @@ class Grouper(Base):
         self.extensions = self._prepare_ext(command_ags.extensions)
         self.files = self._prepare_files()
         self.without_ext = command_ags.without_ext
+        self.verbose = command_ags.verbose
 
     def _prepare_ext(self, ext: list) -> set:
         if len(ext) == 0:
@@ -85,6 +86,8 @@ class Grouper(Base):
             else:
                 end_path = self.path + '/' + end + '/' + filename
             os.replace(start_path, end_path)
+            if self.verbose:
+                print(start_path, '->', end_path)
         logger.info(f'%d FILES WITH EXTs MOVED', len(self.files))
 
     def move_files_without_ext(self):
@@ -106,6 +109,8 @@ class Grouper(Base):
                 else:
                     end_path = self.path + '/' + end + '/' + filename
                 os.replace(start_path, end_path)
+                if self.verbose:
+                    print(start_path, '->', end_path)
         logger.info(f'%d FILES WITHOUT EXTs MOVED', len(files))
 
     def run(self):
@@ -119,7 +124,7 @@ class Grouper(Base):
 if __name__ == "__main__":
     try:
         args = parse_args()
-        command_args = CommandArgs(args.p, args.e, args.a)
+        command_args = CommandArgs(args.p, args.e, args.a, args.v)
         grouper = Grouper(command_args)
         grouper.run()
     except Exception as e:

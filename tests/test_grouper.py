@@ -27,7 +27,7 @@ class TestGrouper(unittest.TestCase):
         """
         extensions = set(['xls', 'docx', 'pdf'])
         path = self.generate_files(extensions)
-        command_args = CommandArgs(path, [], False)
+        command_args = CommandArgs(path, [], False, True)
 
         grouper = Grouper(command_args)
         found_ext = grouper.get_extensions()
@@ -41,7 +41,7 @@ class TestGrouper(unittest.TestCase):
         """
         extensions = set(['xls', 'docx', 'pdf'])
         path = self.generate_files(extensions)
-        command_args = CommandArgs(path, [], False)
+        command_args = CommandArgs(path, [], False, False)
 
         grouper = Grouper(command_args)
         grouper.run()
@@ -61,7 +61,7 @@ class TestGrouper(unittest.TestCase):
         file2 = open(temp_path_dir + '/' + 'file.csv', 'w')
         file2.close()
 
-        command_args = CommandArgs(temp_path_dir, [], False)
+        command_args = CommandArgs(temp_path_dir, [], False, True)
         grouper = Grouper(command_args)
         grouper.run()
         len_files = len(os.listdir(temp_path_dir + '/' + 'csv'))
@@ -79,7 +79,7 @@ class TestGrouper(unittest.TestCase):
         file2 = open(temp_path_dir + '/' + 'file2.txt', 'w')
         file2.close()
 
-        command_args = CommandArgs(temp_path_dir, ['csv'], False)
+        command_args = CommandArgs(temp_path_dir, ['csv'], False, True)
         grouper = Grouper(command_args)
         grouper.run()
 
@@ -104,13 +104,14 @@ class TestGrouper(unittest.TestCase):
         file2 = open(temp_path_dir + '/' + 'file2', 'w')
         file2.close()
 
-        command_args = CommandArgs(temp_path_dir, [], True)
+        command_args = CommandArgs(temp_path_dir, [], True, False)
         grouper = Grouper(command_args)
         grouper.run()
 
         len_unk_files = len(os.listdir(temp_path_dir + '/UNK_EXT'))
         shutil.rmtree(temp_path_dir)
         self.assertEqual(len_unk_files, 2)
+
 
 if __name__ == '__main__':
     unittest.main()
