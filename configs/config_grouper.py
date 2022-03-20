@@ -9,6 +9,7 @@ class CommandArgs:
     path: str
     extensions: list
     without_ext: bool
+    verbose: bool
 
 
 def parse_args() -> argparse.Namespace:
@@ -16,4 +17,5 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('-p', default='.', help='path to work directory [~/Downloads]')
     parser.add_argument('-e', nargs='*', default=[], help='list of grouping extensions [csv/txt/...]')
     parser.add_argument('-a', action='store_true', help='group files without extension')
+    parser.add_argument('-v', action='store_true', help='verbose moving process')
     return parser.parse_args()
