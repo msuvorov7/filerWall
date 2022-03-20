@@ -49,8 +49,11 @@ class Duplicator(Base):
         """
         for name in os.listdir(path):
             if name.split('/')[-1][0] == '.':
+                # скрытый файл в Linux
                 continue
             name = os.path.join(path, name)
+            if os.path.islink(name):
+                continue
             if os.path.isdir(name):
                 if self.recursive:
                     self.walk_rec(name)
